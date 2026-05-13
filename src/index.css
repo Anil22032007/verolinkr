@@ -1,0 +1,38 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --vero-bg: #0A0A0F;
+  --vero-surface: #13131A;
+  --vero-border: rgba(255, 255, 255, 0.08);
+  --vero-accent: #FF5C35;
+  --vero-accent2: #FFB347;
+  --vero-text: #F5F3EE;
+  --vero-muted: rgba(245, 243, 238, 0.5);
+  --vero-card: #16161F;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--vero-bg);
+  color: var(--vero-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
