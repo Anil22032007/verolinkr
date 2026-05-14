@@ -193,3 +193,20 @@
 }
 
 .dash-newsletter-btn:hover { opacity: 0.88; }
+
+.dash-card.clickable {
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.dash-card.clickable:hover {
+  border-color: rgba(255,92,53,0.4);
+  transform: translateY(-2px);
+}
+
+.dash-card-action {
+  color: var(--vero-accent);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.75rem;
+}
