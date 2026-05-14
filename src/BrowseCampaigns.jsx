@@ -13,6 +13,7 @@ function BrowseCampaigns({ user, onBack }) {
   useEffect(() => {
     fetchCampaigns();
     fetchMyApplications();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchCampaigns = async () => {
