@@ -549,3 +549,277 @@
   .campaigns-list { padding: 0 1.5rem; }
   .campaign-card { padding: 1.25rem; }
 }
+
+/* CAMPAIGN MODEL SELECTION */
+.model-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  max-width: 800px;
+  margin: 2.5rem auto;
+  padding: 0 2.5rem;
+}
+
+@media (max-width: 600px) {
+  .model-grid { grid-template-columns: 1fr; }
+}
+
+.model-card {
+  background: var(--vero-card);
+  border: 1px solid var(--vero-border);
+  border-radius: 14px;
+  padding: 1.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.model-card:hover {
+  border-color: rgba(255,92,53,0.4);
+  transform: translateY(-2px);
+}
+
+.model-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+
+.model-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--vero-text);
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.02em;
+}
+
+.model-subtitle {
+  font-size: 0.75rem;
+  color: var(--vero-accent);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.75rem;
+}
+
+.model-desc {
+  font-size: 0.85rem;
+  color: var(--vero-muted);
+  line-height: 1.65;
+  font-weight: 300;
+  margin-bottom: 1rem;
+}
+
+.model-best {
+  font-size: 0.78rem;
+  color: var(--vero-muted);
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+.model-best-label {
+  color: var(--vero-text);
+  font-weight: 500;
+}
+
+.model-select-btn {
+  color: var(--vero-accent);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* CAMPAIGN TYPE BADGES */
+.campaign-type-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.2rem 0.65rem;
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.campaign-type-badge.cpv {
+  background: rgba(100,149,237,0.12);
+  border: 1px solid rgba(100,149,237,0.25);
+  color: #8ab4f8;
+}
+
+.campaign-type-badge.participation {
+  background: rgba(29,158,117,0.1);
+  border: 1px solid rgba(29,158,117,0.2);
+  color: #5DCAA5;
+}
+
+.campaign-type-badge.one_time {
+  background: rgba(255,179,71,0.1);
+  border: 1px solid rgba(255,179,71,0.2);
+  color: #FFB347;
+}
+
+/* CAMPAIGN MODEL INFO BOX */
+.campaign-model-info {
+  background: rgba(255,92,53,0.05);
+  border: 1px solid rgba(255,92,53,0.12);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.cmi-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--vero-text);
+  margin-bottom: 0.35rem;
+}
+
+.cmi-desc {
+  font-size: 0.8rem;
+  color: var(--vero-muted);
+  line-height: 1.6;
+  font-weight: 300;
+}
+
+/* TOGGLE FIELD */
+.toggle-field {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--vero-border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.toggle-label {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.toggle-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: var(--vero-accent);
+  flex-shrink: 0;
+}
+
+.toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.toggle-text strong {
+  font-size: 0.875rem;
+  color: var(--vero-text);
+  font-weight: 500;
+}
+
+.toggle-text span {
+  font-size: 0.8rem;
+  color: var(--vero-muted);
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+/* FILTER BAR */
+.filter-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1.25rem 2.5rem 0;
+  max-width: 760px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--vero-border);
+  color: var(--vero-muted);
+  padding: 0.45rem 1rem;
+  border-radius: 100px;
+  font-size: 0.82rem;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn.active {
+  background: var(--vero-accent);
+  border-color: var(--vero-accent);
+  color: #fff;
+  font-weight: 500;
+}
+
+.filter-btn:hover:not(.active) {
+  border-color: rgba(255,255,255,0.2);
+  color: var(--vero-text);
+}
+
+/* CPV JOIN INFO */
+.cpv-join-info {
+  background: rgba(100,149,237,0.08);
+  border: 1px solid rgba(100,149,237,0.2);
+  color: #8ab4f8;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.modal-card {
+  background: var(--vero-surface);
+  border: 1px solid var(--vero-border);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--vero-text);
+  letter-spacing: -0.02em;
+}
+
+.modal-close {
+  background: transparent;
+  border: 1px solid var(--vero-border);
+  color: var(--vero-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  color: var(--vero-text);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.applied-badge.inactive {
+  background: rgba(255,255,255,0.04);
+  border-color: var(--vero-border);
+  color: var(--vero-muted);
+}
