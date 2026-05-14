@@ -10,6 +10,7 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
 
   useEffect(() => {
     fetchMyCampaigns();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchMyCampaigns = async () => {
