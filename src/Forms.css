@@ -823,3 +823,59 @@
   border-color: var(--vero-border);
   color: var(--vero-muted);
 }
+
+/* CONTENT SUBMISSION */
+.submission-status {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.submission-form {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,92,53,0.15);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.submission-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--vero-text);
+  margin-bottom: 0.4rem;
+}
+
+.submission-desc {
+  font-size: 0.82rem;
+  color: var(--vero-muted);
+  line-height: 1.6;
+  font-weight: 300;
+  margin-bottom: 1rem;
+}
+
+.submitted-content {
+  background: rgba(100,149,237,0.06);
+  border: 1px solid rgba(100,149,237,0.15);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.submission-link {
+  font-size: 0.85rem;
+  color: #8ab4f8;
+  word-break: break-all;
+  text-decoration: underline;
+}
+
+.app-your-message {
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--vero-border);
+}
