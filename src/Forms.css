@@ -879,3 +879,138 @@
   margin-bottom: 1rem;
   border: 1px solid var(--vero-border);
 }
+
+/* PAYMENT */
+.payment-wrap {
+  min-height: 100vh;
+  background: var(--vero-bg);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.payment-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 2.5rem;
+  border-bottom: 1px solid var(--vero-border);
+  background: rgba(10,10,15,0.95);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.payment-card {
+  max-width: 480px;
+  margin: 2.5rem auto;
+  padding: 0 2.5rem;
+}
+
+.payment-campaign-info {
+  margin-bottom: 1.5rem;
+}
+
+.payment-campaign-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--vero-text);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.3rem;
+}
+
+.payment-campaign-type {
+  font-size: 0.82rem;
+  color: var(--vero-muted);
+  font-weight: 300;
+  text-transform: capitalize;
+}
+
+.payment-breakdown {
+  background: var(--vero-card);
+  border: 1px solid var(--vero-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--vero-muted);
+  padding: 0.4rem 0;
+}
+
+.payment-row.total {
+  color: var(--vero-text);
+  font-weight: 600;
+  font-size: 1rem;
+  font-family: 'Syne', sans-serif;
+}
+
+.payment-divider {
+  border: none;
+  border-top: 1px solid var(--vero-border);
+  margin: 0.5rem 0;
+}
+
+.payment-features {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-feature {
+  font-size: 0.83rem;
+  color: var(--vero-muted);
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.payment-success {
+  max-width: 440px;
+  margin: 5rem auto;
+  padding: 0 2.5rem;
+  text-align: center;
+}
+
+.payment-success-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.payment-success-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: var(--vero-text);
+  letter-spacing: -0.025em;
+  margin-bottom: 0.75rem;
+}
+
+.payment-success-desc {
+  font-size: 0.95rem;
+  color: var(--vero-muted);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+.fund-escrow-btn {
+  background: linear-gradient(135deg, rgba(255,92,53,0.15), rgba(255,179,71,0.15));
+  border: 1px solid rgba(255,92,53,0.35);
+  color: var(--vero-accent);
+  padding: 0.55rem 1.1rem;
+  border-radius: 7px;
+  font-size: 0.85rem;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.fund-escrow-btn:hover {
+  background: linear-gradient(135deg, rgba(255,92,53,0.25), rgba(255,179,71,0.25));
+}
