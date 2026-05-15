@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabase';
+import Payment from './Payment';
 import './Forms.css';
 
 function ManageCampaigns({ user, onBack, onCreateNew }) {
@@ -7,6 +8,7 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
   const [applications, setApplications] = useState({});
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
+  const [payingCampaign, setPayingCampaign] = useState(null);
 
   useEffect(() => {
     fetchMyCampaigns();
@@ -70,13 +72,29 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
     return labels[status] || { text: status, color: 'var(--vero-muted)' };
   };
 
+  if (payingCampaign) {
+    return (
+      <Payment
+        campaign={payingCampaign}
+        user={user}
+        onBack={() => setPayingCampaign(null)}
+        onSuccess={() => {
+          setCampaigns((prev) =>
+            prev.map((c) => c.id === payingCampaign.id ? { ...c, escrow_status: 'funded' } : c)
+          );
+          setPayingCampaign(null);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="form-wrap">
       <div className="form-header">
         <button className="back-btn" onClick={onBack}>← Back</button>
         <div className="form-header-text">
           <h1>My Campaigns</h1>
-          <p>Manage campaigns and review creator submissions</p>
+          <p>Manage campaigns, fund escrow, review submissions</p>
         </div>
         <button className="form-submit" style={{ width: 'auto', padding: '0.6rem 1.25rem' }} onClick={onCreateNew}>
           + New Campaign
@@ -89,7 +107,7 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
         <div className="campaigns-empty">
           <div className="empty-icon">📋</div>
           <div className="empty-title">No campaigns yet</div>
-          <p className="empty-desc">Create your first campaign and start receiving applications from verified creators.</p>
+          <p className="empty-desc">Create your first campaign and start receiving creator applications.</p>
           <button className="form-submit" style={{ marginTop: '1.5rem' }} onClick={onCreateNew}>Create First Campaign →</button>
         </div>
       ) : (
@@ -103,12 +121,19 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
                       {MODEL_LABELS[campaign.campaign_type] || '🤝 One Time'}
                     </div>
                     <div className="campaign-niche">{campaign.niche}</div>
+                    <div className={`status-badge ${campaign.status}`}>{campaign.status}</div>
                   </div>
                   <h2 className="campaign-title">{campaign.title}</h2>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+                <div style={{ textAlign: 'right' }}>
                   <div className="campaign-budget">{formatBudget(campaign.budget)}</div>
-                  <div className={`status-badge ${campaign.status}`}>{campaign.status}</div>
+                  <div style={{ fontSize: '0.72rem', marginTop: '4px' }}>
+                    {campaign.escrow_status === 'funded' ? (
+                      <span style={{ color: '#5DCAA5' }}>🔒 Escrow Funded</span>
+                    ) : (
+                      <span style={{ color: '#FFB347' }}>⚠ Escrow Not Funded</span>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -123,13 +148,13 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
                   <span className="meta-label">Deadline</span>
                   <span className="meta-value">{formatDate(campaign.deadline)}</span>
                 </div>
-                {campaign.campaign_type === 'cpv' && (
+                {campaign.campaign_type === 'cpv' && campaign.cpv_rate && (
                   <div className="meta-item">
                     <span className="meta-label">Rate</span>
                     <span className="meta-value">₹{campaign.cpv_rate}/view</span>
                   </div>
                 )}
-                {campaign.campaign_type === 'participation' && (
+                {campaign.campaign_type === 'participation' && campaign.payout_per_post && (
                   <div className="meta-item">
                     <span className="meta-label">Payout/Creator</span>
                     <span className="meta-value">₹{Number(campaign.payout_per_post).toLocaleString()}</span>
@@ -138,6 +163,14 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
               </div>
 
               <div className="campaign-actions">
+                {campaign.escrow_status !== 'funded' && campaign.status === 'open' && (
+                  <button
+                    className="fund-escrow-btn"
+                    onClick={() => setPayingCampaign(campaign)}
+                  >
+                    🔒 Fund Escrow
+                  </button>
+                )}
                 <button className="view-apps-btn" onClick={() => fetchApplications(campaign.id)}>
                   {expanded === campaign.id ? 'Hide Applications' : 'View Applications'}
                 </button>
@@ -159,14 +192,11 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
                         <div className="application-card" key={app.id}>
                           <div className="app-top">
                             <div className="app-date">Applied {formatDate(app.created_at)}</div>
-                            <div className="app-status" style={{ background: 'transparent', border: 'none', color: sl.color, fontWeight: 500, fontSize: '0.78rem' }}>
-                              ● {sl.text}
-                            </div>
+                            <div style={{ color: sl.color, fontWeight: 500, fontSize: '0.78rem' }}>● {sl.text}</div>
                           </div>
 
                           <p className="app-message">{app.message}</p>
 
-                          {/* Show submitted content if creator submitted */}
                           {app.submission_url && (
                             <div className="submitted-content" style={{ marginBottom: '0.75rem' }}>
                               <div className="meta-label" style={{ marginBottom: '0.4rem' }}>Content submitted</div>
@@ -184,7 +214,7 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
                           <div className="app-actions">
                             {app.status === 'pending' && (
                               <>
-                                <button className="approve-btn" onClick={() => updateStatus(app.id, campaign.id, 'approved')}>✅ Approve</button>
+                                <button className="approve-btn" onClick={() => updateStatus(app.id, campaign.id, 'approved')}>✅ Approve Creator</button>
                                 <button className="reject-btn" onClick={() => updateStatus(app.id, campaign.id, 'rejected')}>✕ Reject</button>
                               </>
                             )}
