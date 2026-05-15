@@ -4,6 +4,7 @@ import CreateCampaign from './CreateCampaign';
 import ManageCampaigns from './ManageCampaigns';
 import BrowseCampaigns from './BrowseCampaigns';
 import GigMarketplace from './GigMarketplace';
+import CreatorApplications from './CreatorApplications';
 import './Dashboard.css';
 
 function Dashboard({ user, onSignOut }) {
@@ -29,6 +30,7 @@ function Dashboard({ user, onSignOut }) {
   if (view === 'manage') return <ManageCampaigns user={user} onBack={() => setView('home')} onCreateNew={() => setView('create')} />;
   if (view === 'browse') return <BrowseCampaigns user={user} onBack={() => setView('home')} />;
   if (view === 'gigs') return <GigMarketplace user={user} role={role} onBack={() => setView('home')} />;
+  if (view === 'myapps') return <CreatorApplications user={user} onBack={() => setView('home')} />;
 
   return (
     <div className="dash-wrap">
