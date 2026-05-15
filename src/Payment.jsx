@@ -55,7 +55,7 @@ function Payment({ campaign, user, onBack, onSuccess }) {
         body: JSON.stringify({
           amount: campaign.budget,
           currency: 'INR',
-          receipt: `campaign_${campaign.id}`,
+          receipt: `c_${campaign.id.substring(0, 30)}`,
           notes: {
             campaign_id: campaign.id,
             campaign_title: campaign.title,
