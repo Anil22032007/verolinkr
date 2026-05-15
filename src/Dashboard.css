@@ -210,3 +210,49 @@
   font-weight: 500;
   margin-top: 0.75rem;
 }
+
+.dash-models-bar {
+  background: var(--vero-card);
+  border: 1px solid var(--vero-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.dash-models-title {
+  font-size: 0.75rem;
+  color: var(--vero-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.dash-models-list {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.dash-model-pill {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.1rem;
+}
+
+.dash-model-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--vero-text);
+}
+
+.dash-model-desc {
+  font-size: 0.75rem;
+  color: var(--vero-muted);
+  font-weight: 300;
+}
