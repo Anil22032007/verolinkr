@@ -24,41 +24,51 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
   };
 
   const fetchApplications = async (campaignId) => {
-    if (applications[campaignId]) {
-      setExpanded(expanded === campaignId ? null : campaignId);
+    if (applications[campaignId] && expanded === campaignId) {
+      setExpanded(null);
       return;
     }
-
     const { data } = await supabase
       .from('applications')
       .select('*')
       .eq('campaign_id', campaignId)
       .order('created_at', { ascending: false });
-
     setApplications((prev) => ({ ...prev, [campaignId]: data || [] }));
     setExpanded(campaignId);
   };
 
-  const updateApplicationStatus = async (appId, campaignId, status) => {
+  const updateStatus = async (appId, campaignId, status) => {
     await supabase.from('applications').update({ status }).eq('id', appId);
     setApplications((prev) => ({
       ...prev,
-      [campaignId]: prev[campaignId].map((a) =>
-        a.id === appId ? { ...a, status } : a
-      ),
+      [campaignId]: prev[campaignId].map((a) => a.id === appId ? { ...a, status } : a),
     }));
   };
 
   const closeCampaign = async (campaignId) => {
     await supabase.from('campaigns').update({ status: 'closed' }).eq('id', campaignId);
-    setCampaigns((prev) =>
-      prev.map((c) => (c.id === campaignId ? { ...c, status: 'closed' } : c))
-    );
+    setCampaigns((prev) => prev.map((c) => c.id === campaignId ? { ...c, status: 'closed' } : c));
   };
 
-  const formatBudget = (amount) => '₹' + amount.toLocaleString('en-IN');
-  const formatDate = (dateStr) =>
-    new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  const formatBudget = (amount) => '₹' + Number(amount).toLocaleString('en-IN');
+  const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Ongoing';
+
+  const MODEL_LABELS = {
+    cpv: '📊 CPV',
+    participation: '🚀 Participation',
+    one_time: '🤝 One Time',
+  };
+
+  const getStatusLabel = (status) => {
+    const labels = {
+      pending: { text: 'Pending', color: '#FFB347' },
+      approved: { text: 'Approved', color: '#5DCAA5' },
+      submitted: { text: 'Content Submitted', color: '#8ab4f8' },
+      rejected: { text: 'Rejected', color: '#F09595' },
+      completed: { text: 'Completed', color: '#5DCAA5' },
+    };
+    return labels[status] || { text: status, color: 'var(--vero-muted)' };
+  };
 
   return (
     <div className="form-wrap">
@@ -66,7 +76,7 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
         <button className="back-btn" onClick={onBack}>← Back</button>
         <div className="form-header-text">
           <h1>My Campaigns</h1>
-          <p>Manage your campaigns and review creator applications</p>
+          <p>Manage campaigns and review creator submissions</p>
         </div>
         <button className="form-submit" style={{ width: 'auto', padding: '0.6rem 1.25rem' }} onClick={onCreateNew}>
           + New Campaign
@@ -80,9 +90,7 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
           <div className="empty-icon">📋</div>
           <div className="empty-title">No campaigns yet</div>
           <p className="empty-desc">Create your first campaign and start receiving applications from verified creators.</p>
-          <button className="form-submit" style={{ marginTop: '1.5rem' }} onClick={onCreateNew}>
-            Create First Campaign →
-          </button>
+          <button className="form-submit" style={{ marginTop: '1.5rem' }} onClick={onCreateNew}>Create First Campaign →</button>
         </div>
       ) : (
         <div className="campaigns-list">
@@ -90,7 +98,12 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
             <div className="campaign-card" key={campaign.id}>
               <div className="campaign-top">
                 <div>
-                  <div className="campaign-niche">{campaign.niche}</div>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                    <div className={`campaign-type-badge ${campaign.campaign_type}`}>
+                      {MODEL_LABELS[campaign.campaign_type] || '🤝 One Time'}
+                    </div>
+                    <div className="campaign-niche">{campaign.niche}</div>
+                  </div>
                   <h2 className="campaign-title">{campaign.title}</h2>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
@@ -110,20 +123,26 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
                   <span className="meta-label">Deadline</span>
                   <span className="meta-value">{formatDate(campaign.deadline)}</span>
                 </div>
+                {campaign.campaign_type === 'cpv' && (
+                  <div className="meta-item">
+                    <span className="meta-label">Rate</span>
+                    <span className="meta-value">₹{campaign.cpv_rate}/view</span>
+                  </div>
+                )}
+                {campaign.campaign_type === 'participation' && (
+                  <div className="meta-item">
+                    <span className="meta-label">Payout/Creator</span>
+                    <span className="meta-value">₹{Number(campaign.payout_per_post).toLocaleString()}</span>
+                  </div>
+                )}
               </div>
 
               <div className="campaign-actions">
-                <button
-                  className="view-apps-btn"
-                  onClick={() => fetchApplications(campaign.id)}
-                >
+                <button className="view-apps-btn" onClick={() => fetchApplications(campaign.id)}>
                   {expanded === campaign.id ? 'Hide Applications' : 'View Applications'}
                 </button>
                 {campaign.status === 'open' && (
-                  <button
-                    className="close-campaign-btn"
-                    onClick={() => closeCampaign(campaign.id)}
-                  >
+                  <button className="close-campaign-btn" onClick={() => closeCampaign(campaign.id)}>
                     Close Campaign
                   </button>
                 )}
@@ -134,31 +153,56 @@ function ManageCampaigns({ user, onBack, onCreateNew }) {
                   {!applications[campaign.id] || applications[campaign.id].length === 0 ? (
                     <div className="no-apps">No applications yet. Share your campaign to attract creators.</div>
                   ) : (
-                    applications[campaign.id].map((app) => (
-                      <div className="application-card" key={app.id}>
-                        <div className="app-top">
-                          <div className="app-date">Applied {formatDate(app.created_at)}</div>
-                          <div className={`app-status ${app.status}`}>{app.status}</div>
-                        </div>
-                        <p className="app-message">{app.message}</p>
-                        {app.status === 'pending' && (
-                          <div className="app-actions">
-                            <button
-                              className="approve-btn"
-                              onClick={() => updateApplicationStatus(app.id, campaign.id, 'approved')}
-                            >
-                              ✅ Approve
-                            </button>
-                            <button
-                              className="reject-btn"
-                              onClick={() => updateApplicationStatus(app.id, campaign.id, 'rejected')}
-                            >
-                              ✕ Reject
-                            </button>
+                    applications[campaign.id].map((app) => {
+                      const sl = getStatusLabel(app.status);
+                      return (
+                        <div className="application-card" key={app.id}>
+                          <div className="app-top">
+                            <div className="app-date">Applied {formatDate(app.created_at)}</div>
+                            <div className="app-status" style={{ background: 'transparent', border: 'none', color: sl.color, fontWeight: 500, fontSize: '0.78rem' }}>
+                              ● {sl.text}
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    ))
+
+                          <p className="app-message">{app.message}</p>
+
+                          {/* Show submitted content if creator submitted */}
+                          {app.submission_url && (
+                            <div className="submitted-content" style={{ marginBottom: '0.75rem' }}>
+                              <div className="meta-label" style={{ marginBottom: '0.4rem' }}>Content submitted</div>
+                              <a href={app.submission_url} target="_blank" rel="noreferrer" className="submission-link">
+                                {app.submission_url} ↗
+                              </a>
+                              {app.submission_note && (
+                                <p style={{ fontSize: '0.82rem', color: 'var(--vero-muted)', marginTop: '0.35rem', fontWeight: 300 }}>
+                                  {app.submission_note}
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          <div className="app-actions">
+                            {app.status === 'pending' && (
+                              <>
+                                <button className="approve-btn" onClick={() => updateStatus(app.id, campaign.id, 'approved')}>✅ Approve</button>
+                                <button className="reject-btn" onClick={() => updateStatus(app.id, campaign.id, 'rejected')}>✕ Reject</button>
+                              </>
+                            )}
+                            {app.status === 'submitted' && (
+                              <>
+                                <button className="approve-btn" onClick={() => updateStatus(app.id, campaign.id, 'completed')}>✅ Approve & Release Payment</button>
+                                <button className="reject-btn" onClick={() => updateStatus(app.id, campaign.id, 'approved')}>↩ Request Changes</button>
+                              </>
+                            )}
+                            {app.status === 'completed' && (
+                              <div style={{ fontSize: '0.85rem', color: '#5DCAA5', fontWeight: 500 }}>
+                                💰 Payment released to creator
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               )}
