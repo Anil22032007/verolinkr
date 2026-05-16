@@ -7,21 +7,38 @@ import GigMarketplace from './GigMarketplace';
 import CreatorApplications from './CreatorApplications';
 import CPVTracking from './CPVTracking';
 import CPVDashboard from './CPVDashboard';
+import Notifications from './Notifications';
+import CreatorProfile from './CreatorProfile';
+import EarningsWallet from './EarningsWallet';
+import CampaignAnalytics from './CampaignAnalytics';
 import './Dashboard.css';
 
 function Dashboard({ user, onSignOut }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState('home');
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-      setProfile(data);
-      setLoading(false);
-    };
     fetchProfile();
-  }, [user]);
+    fetchUnreadCount();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const fetchProfile = async () => {
+    const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+    setProfile(data);
+    setLoading(false);
+  };
+
+  const fetchUnreadCount = async () => {
+    const { count } = await supabase
+      .from('notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('read', false);
+    setUnreadCount(count || 0);
+  };
 
   const role = profile?.role || user?.user_metadata?.role || 'creator';
   const name = profile?.name || user?.user_metadata?.name || user?.email;
@@ -35,6 +52,10 @@ function Dashboard({ user, onSignOut }) {
   if (view === 'myapps') return <CreatorApplications user={user} onBack={() => setView('home')} />;
   if (view === 'cpv') return <CPVTracking user={user} onBack={() => setView('home')} />;
   if (view === 'cpvdash') return <CPVDashboard user={user} onBack={() => setView('home')} />;
+  if (view === 'notifications') return <Notifications user={user} onBack={() => { setView('home'); fetchUnreadCount(); }} />;
+  if (view === 'profile') return <CreatorProfile user={user} onBack={() => setView('home')} />;
+  if (view === 'wallet') return <EarningsWallet user={user} onBack={() => setView('home')} />;
+  if (view === 'analytics') return <CampaignAnalytics user={user} onBack={() => setView('home')} />;
 
   return (
     <div className="dash-wrap">
@@ -43,6 +64,9 @@ function Dashboard({ user, onSignOut }) {
         <div className="dash-nav-right">
           <span className="dash-role-badge">{role === 'brand' ? 'Brand' : 'Creator'}</span>
           <span className="dash-user-name">{name}</span>
+          <button className="dash-notif-btn" onClick={() => setView('notifications')}>
+            🔔 {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
+          </button>
           <button className="dash-signout" onClick={onSignOut}>Sign Out</button>
         </div>
       </nav>
@@ -65,7 +89,7 @@ function Dashboard({ user, onSignOut }) {
               <div className="dash-card clickable" onClick={() => setView('cpv')}>
                 <div className="dash-card-icon">📊</div>
                 <div className="dash-card-title">CPV Tracking</div>
-                <p className="dash-card-desc">Submit posts to CPV campaigns. Track your views and milestone earnings.</p>
+                <p className="dash-card-desc">Submit posts to CPV campaigns. Track views and milestone earnings.</p>
                 <div className="dash-card-action">Track Views →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('gigs')}>
@@ -79,6 +103,18 @@ function Dashboard({ user, onSignOut }) {
                 <div className="dash-card-title">My Applications</div>
                 <p className="dash-card-desc">Track applications and submit content for approved campaigns.</p>
                 <div className="dash-card-action">View Applications →</div>
+              </div>
+              <div className="dash-card clickable" onClick={() => setView('wallet')}>
+                <div className="dash-card-icon">💰</div>
+                <div className="dash-card-title">Earnings Wallet</div>
+                <p className="dash-card-desc">Track earnings across all campaigns. Request withdrawals.</p>
+                <div className="dash-card-action">View Wallet →</div>
+              </div>
+              <div className="dash-card clickable" onClick={() => setView('profile')}>
+                <div className="dash-card-icon">👤</div>
+                <div className="dash-card-title">My Profile</div>
+                <p className="dash-card-desc">Complete your creator profile to attract better brand deals.</p>
+                <div className="dash-card-action">Edit Profile →</div>
               </div>
             </>
           ) : (
@@ -95,10 +131,16 @@ function Dashboard({ user, onSignOut }) {
                 <p className="dash-card-desc">Fund escrow, review applications, approve content.</p>
                 <div className="dash-card-action">Manage →</div>
               </div>
+              <div className="dash-card clickable" onClick={() => setView('analytics')}>
+                <div className="dash-card-icon">📈</div>
+                <div className="dash-card-title">Analytics</div>
+                <p className="dash-card-desc">Track performance, views, completion rates across all campaigns.</p>
+                <div className="dash-card-action">View Analytics →</div>
+              </div>
               <div className="dash-card clickable" onClick={() => setView('cpvdash')}>
                 <div className="dash-card-icon">📊</div>
                 <div className="dash-card-title">CPV Monitor</div>
-                <p className="dash-card-desc">Track views, verify submissions, monitor CPV campaign performance.</p>
+                <p className="dash-card-desc">Track views, verify submissions, monitor CPV performance.</p>
                 <div className="dash-card-action">Monitor →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('gigs')}>
