@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './supabase';
 import './Forms.css';
 
+
 function CreatorApplications({ user, onBack }) {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
