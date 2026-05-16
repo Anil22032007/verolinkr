@@ -6,7 +6,7 @@ const NICHES = ['Fashion', 'Tech', 'Food', 'Travel', 'Fitness', 'Beauty', 'Finan
 
 function CreatorProfile({ user, onBack }) {
   const [, setProfile] = useState(null);
-  const [baseProfile, setBaseProfile] = useState(null);
+  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState('');
@@ -30,7 +30,7 @@ function CreatorProfile({ user, onBack }) {
 
   const fetchProfile = async () => {
     const { data: base } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-    setBaseProfile(base);
+    
 
     const { data } = await supabase.from('creator_profiles').select('*').eq('id', user.id).single();
     if (data) {
