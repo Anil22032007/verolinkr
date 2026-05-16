@@ -3,7 +3,7 @@ import { supabase } from './supabase';
 import './Forms.css';
 
 function EarningsWallet({ user, onBack }) {
-  const [, setEarnings] = useState([]);
+  
   const [applications, setApplications] = useState([]);
   const [cpvSubmissions, setCpvSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
