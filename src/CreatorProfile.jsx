@@ -29,7 +29,7 @@ function CreatorProfile({ user, onBack }) {
   }, []);
 
   const fetchProfile = async () => {
-    const { data: base } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+    await supabase.from('profiles').select('*').eq('id', user.id).single();
     
 
     const { data } = await supabase.from('creator_profiles').select('*').eq('id', user.id).single();
