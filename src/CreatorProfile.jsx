@@ -5,7 +5,7 @@ import './Forms.css';
 const NICHES = ['Fashion', 'Tech', 'Food', 'Travel', 'Fitness', 'Beauty', 'Finance', 'Education', 'Gaming', 'Lifestyle', 'Other'];
 
 function CreatorProfile({ user, onBack }) {
-  const [profile, setProfile] = useState(null);
+  const [, setProfile] = useState(null);
   const [baseProfile, setBaseProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
