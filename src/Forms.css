@@ -1014,3 +1014,75 @@
 .fund-escrow-btn:hover {
   background: linear-gradient(135deg, rgba(255,92,53,0.25), rgba(255,179,71,0.25));
 }
+
+/* CPV TRACKING */
+.cpv-section-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--vero-text);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.cpv-api-note {
+  background: rgba(29,158,117,0.08);
+  border: 1px solid rgba(29,158,117,0.2);
+  color: #5DCAA5;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 400;
+}
+
+.cpv-manual-note {
+  background: rgba(255,179,71,0.08);
+  border: 1px solid rgba(255,179,71,0.2);
+  color: #FFB347;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.cpv-live-stats {
+  display: flex;
+  gap: 0;
+  background: rgba(255,92,53,0.05);
+  border: 1px solid rgba(255,92,53,0.12);
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+
+.cpv-stat {
+  flex: 1;
+  padding: 1rem;
+  text-align: center;
+  border-right: 1px solid rgba(255,92,53,0.1);
+}
+
+.cpv-stat:last-child { border-right: none; }
+
+.cpv-stat-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--vero-accent);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.2rem;
+}
+
+.cpv-stat-label {
+  font-size: 0.72rem;
+  color: var(--vero-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+@media (max-width: 500px) {
+  .cpv-live-stats { flex-wrap: wrap; }
+  .cpv-stat { min-width: 50%; border-bottom: 1px solid rgba(255,92,53,0.1); }
+}
