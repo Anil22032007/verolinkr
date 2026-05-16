@@ -11,6 +11,7 @@ import Notifications from './Notifications';
 import CreatorProfile from './CreatorProfile';
 import EarningsWallet from './EarningsWallet';
 import CampaignAnalytics from './CampaignAnalytics';
+import AdminPanel from './AdminPanel';
 import './Dashboard.css';
 
 function Dashboard({ user, onSignOut }) {
@@ -56,6 +57,7 @@ function Dashboard({ user, onSignOut }) {
   if (view === 'profile') return <CreatorProfile user={user} onBack={() => setView('home')} />;
   if (view === 'wallet') return <EarningsWallet user={user} onBack={() => setView('home')} />;
   if (view === 'analytics') return <CampaignAnalytics user={user} onBack={() => setView('home')} />;
+  if (view === 'admin') return <AdminPanel user={user} onBack={() => setView('home')} />;
 
   return (
     <div className="dash-wrap">
@@ -68,6 +70,7 @@ function Dashboard({ user, onSignOut }) {
             🔔 {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
           </button>
           <button className="dash-signout" onClick={onSignOut}>Sign Out</button>
+          {user.email === 'prajapatiab534@gmail.com' && <button className="dash-signout" onClick={() => setView('admin')} style={{background:'rgba(255,92,53,0.1)',borderColor:'rgba(255,92,53,0.3)',color:'var(--vero-accent)'}}>⚙️ Admin</button>}
         </div>
       </nav>
 
