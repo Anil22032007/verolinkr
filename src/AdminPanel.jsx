@@ -8,7 +8,7 @@ const ADMIN_EMAIL = 'prajapatiab534@gmail.com';
 function AdminPanel({ user, onBack }) {
   const [tab, setTab] = useState('overview');
   const [campaigns, setCampaigns] = useState([]);
-  const [users, setUsers] = useState([]);
+
   const [payments, setPayments] = useState([]);
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
