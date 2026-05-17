@@ -16,6 +16,7 @@ import EarningsWallet from './EarningsWallet';
 import CampaignAnalytics from './CampaignAnalytics';
 import AdminPanel from './AdminPanel';
 import ContentCalendar from './ContentCalendar';
+import CreatorSearch from './CreatorSearch';
 import './Dashboard.css';
 
 const ADMIN_EMAIL = 'prajapatiab534@gmail.com';
@@ -63,6 +64,7 @@ function Dashboard({ user, onSignOut }) {
   if (view === 'analytics') return <CampaignAnalytics user={user} onBack={() => setView('home')} />;
   if (view === 'admin') return <AdminPanel user={user} onBack={() => setView('home')} />;
   if (view === 'calendar') return <ContentCalendar user={user} onBack={() => setView('home')} />;
+  if (view === 'creatorsearch') return <CreatorSearch onBack={() => setView('home')} />;
 
   return (
     <div className="dash-wrap">
@@ -113,6 +115,12 @@ function Dashboard({ user, onSignOut }) {
                 <div className="dash-card-title">CPV Leaderboard</div>
                 <p className="dash-card-desc">See top creators across CPV campaigns. Compete for top spot.</p>
                 <div className="dash-card-action">View →</div>
+              </div>
+              <div className="dash-card clickable" onClick={() => setView('creatorsearch')}>
+                <div className="dash-card-icon">🔍</div>
+                <div className="dash-card-title">Find Creators</div>
+                <p className="dash-card-desc">Search verified creators by niche, followers, and engagement rate.</p>
+                <div className="dash-card-action">Search →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('gigs')}>
                 <div className="dash-card-icon">⚡</div>
@@ -170,6 +178,12 @@ function Dashboard({ user, onSignOut }) {
                 <div className="dash-card-title">CPV Monitor</div>
                 <p className="dash-card-desc">Track views, verify submissions, monitor CPV performance.</p>
                 <div className="dash-card-action">Monitor →</div>
+              </div>
+              <div className="dash-card clickable" onClick={() => setView('creatorsearch')}>
+                <div className="dash-card-icon">🔍</div>
+                <div className="dash-card-title">Find Creators</div>
+                <p className="dash-card-desc">Search verified creators by niche, followers, and engagement rate.</p>
+                <div className="dash-card-action">Search →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('gigs')}>
                 <div className="dash-card-icon">⚡</div>
