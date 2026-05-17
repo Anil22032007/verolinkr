@@ -3,9 +3,9 @@ import { supabase } from './supabase';
 import './Forms.css';
 
 function EarningsWallet({ user, onBack }) {
-  
   const [applications, setApplications] = useState([]);
   const [cpvSubmissions, setCpvSubmissions] = useState([]);
+  const [withdrawals, setWithdrawals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [withdrawing, setWithdrawing] = useState(false);
   const [upiId, setUpiId] = useState('');
@@ -18,22 +18,14 @@ function EarningsWallet({ user, onBack }) {
   }, []);
 
   const fetchAllEarnings = async () => {
-    // Completed campaign applications
-    const { data: apps } = await supabase
-      .from('applications')
-      .select('*, campaigns(title, budget, payout_per_post, cpv_rate, campaign_type)')
-      .eq('creator_id', user.id)
-      .eq('status', 'completed');
-
-    // CPV submissions
-    const { data: cpv } = await supabase
-      .from('cpv_submissions')
-      .select('*, campaigns(title, cpv_rate)')
-      .eq('creator_id', user.id)
-      .eq('verified', true);
-
-    setApplications(apps || []);
-    setCpvSubmissions(cpv || []);
+    const [appsRes, cpvRes, withdrawRes] = await Promise.all([
+      supabase.from('applications').select('*, campaigns(title, budget, payout_per_post, cpv_rate, campaign_type)').eq('creator_id', user.id).eq('status', 'completed'),
+      supabase.from('cpv_submissions').select('*, campaigns(title, cpv_rate)').eq('creator_id', user.id).eq('verified', true),
+      supabase.from('withdrawal_requests').select('*').eq('creator_id', user.id).order('created_at', { ascending: false }),
+    ]);
+    setApplications(appsRes.data || []);
+    setCpvSubmissions(cpvRes.data || []);
+    setWithdrawals(withdrawRes.data || []);
     setLoading(false);
   };
 
@@ -53,24 +45,36 @@ function EarningsWallet({ user, onBack }) {
   const totalFromCPV = cpvSubmissions.reduce((sum, s) => sum + calculateCPVEarning(s), 0);
   const totalEarned = totalFromApps + totalFromCPV;
   const platformFee = Math.round(totalEarned * 0.05);
-  const withdrawable = totalEarned - platformFee;
+  const totalWithdrawn = withdrawals.filter(w => w.status === 'paid').reduce((sum, w) => sum + w.amount, 0);
+  const withdrawable = totalEarned - platformFee - totalWithdrawn;
 
   const handleWithdraw = async (e) => {
     e.preventDefault();
+    if (withdrawable <= 0) return;
     setWithdrawing(true);
 
-    await supabase.from('notifications').insert({
-      user_id: user.id,
-      title: 'Withdrawal Request Received',
-      message: `Your withdrawal request of ₹${withdrawable.toLocaleString('en-IN')} to UPI ${upiId} has been received. We will process it within 24 hours.`,
-      type: 'payment',
+    const { error } = await supabase.from('withdrawal_requests').insert({
+      creator_id: user.id,
+      amount: withdrawable,
+      upi_id: upiId,
+      status: 'pending',
     });
 
-    setSuccess(`Withdrawal request submitted! ₹${withdrawable.toLocaleString('en-IN')} will be sent to ${upiId} within 24 hours.`);
-    setShowWithdraw(false);
-    setUpiId('');
+    if (!error) {
+      await supabase.from('notifications').insert({
+        user_id: user.id,
+        title: 'Withdrawal Request Received',
+        message: `Your withdrawal of ₹${withdrawable.toLocaleString('en-IN')} to ${upiId} is being processed within 24 hours.`,
+        type: 'payment',
+        read: false,
+      });
+      setSuccess(`Withdrawal request submitted! ₹${withdrawable.toLocaleString('en-IN')} will be sent to ${upiId} within 24 hours.`);
+      setShowWithdraw(false);
+      setUpiId('');
+      fetchAllEarnings();
+      setTimeout(() => setSuccess(''), 5000);
+    }
     setWithdrawing(false);
-    setTimeout(() => setSuccess(''), 5000);
   };
 
   const formatNum = (n) => Number(n || 0).toLocaleString('en-IN');
@@ -91,86 +95,94 @@ function EarningsWallet({ user, onBack }) {
       {success && <div className="global-success">{success}</div>}
 
       <div className="form-card">
-        {/* Wallet summary */}
         <div className="wallet-summary">
           <div className="wallet-stat">
             <div className="wallet-stat-num">₹{formatNum(totalEarned)}</div>
             <div className="wallet-stat-label">Total Earned</div>
           </div>
           <div className="wallet-stat">
-            <div className="wallet-stat-num">₹{formatNum(platformFee)}</div>
-            <div className="wallet-stat-label">Platform Fee (5%)</div>
+            <div className="wallet-stat-num">₹{formatNum(totalWithdrawn)}</div>
+            <div className="wallet-stat-label">Withdrawn</div>
           </div>
           <div className="wallet-stat highlight">
             <div className="wallet-stat-num">₹{formatNum(withdrawable)}</div>
-            <div className="wallet-stat-label">Available to Withdraw</div>
+            <div className="wallet-stat-label">Available</div>
           </div>
         </div>
 
-        {withdrawable > 0 ? (
-          !showWithdraw ? (
-            <button className="form-submit" onClick={() => setShowWithdraw(true)} style={{ marginBottom: '2rem' }}>
-              Request Withdrawal →
-            </button>
-          ) : (
-            <form onSubmit={handleWithdraw} className="form-body" style={{ marginBottom: '2rem' }}>
-              <div className="field">
-                <label>Your UPI ID</label>
-                <input
-                  type="text"
-                  placeholder="yourname@upi or phone@paytm"
-                  value={upiId}
-                  onChange={(e) => setUpiId(e.target.value)}
-                  required
-                />
+        {withdrawable > 0 && !showWithdraw && (
+          <button className="form-submit" onClick={() => setShowWithdraw(true)} style={{ marginBottom: '1.5rem' }}>
+            Request Withdrawal →
+          </button>
+        )}
+
+        {showWithdraw && (
+          <form onSubmit={handleWithdraw} className="form-body" style={{ marginBottom: '2rem' }}>
+            <div className="field">
+              <label>Your UPI ID</label>
+              <input type="text" placeholder="yourname@upi or phone@paytm" value={upiId} onChange={e => setUpiId(e.target.value)} required />
+            </div>
+            <div className="escrow-note">
+              <div className="escrow-note-icon">💰</div>
+              <div>
+                <div className="escrow-note-title">₹{formatNum(withdrawable)} will be sent to your UPI</div>
+                <div className="escrow-note-desc">Processing within 24 hours. Manual processing until Razorpay Route is activated.</div>
               </div>
-              <div className="escrow-note">
-                <div className="escrow-note-icon">💰</div>
-                <div>
-                  <div className="escrow-note-title">₹{formatNum(withdrawable)} will be sent to your UPI</div>
-                  <div className="escrow-note-desc">Processing time: within 24 hours. Manual processing until Razorpay Route is activated.</div>
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button type="submit" className="form-submit" disabled={withdrawing}>{withdrawing ? 'Submitting...' : 'Confirm Withdrawal →'}</button>
+              <button type="button" onClick={() => setShowWithdraw(false)} style={{ background: 'transparent', border: '1px solid var(--vero-border)', color: 'var(--vero-muted)', padding: '0.9rem 1.5rem', borderRadius: '8px', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}>Cancel</button>
+            </div>
+          </form>
+        )}
+
+        {/* Withdrawal history */}
+        {withdrawals.length > 0 && (
+          <>
+            <div className="cpv-section-title" style={{ marginBottom: '1rem' }}>Withdrawal History</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+              {withdrawals.map(w => (
+                <div className="earning-item" key={w.id}>
+                  <div className="earning-item-left">
+                    <div className="earning-item-icon">💸</div>
+                    <div>
+                      <div className="earning-item-title">Withdrawal to {w.upi_id}</div>
+                      <div className="earning-item-type">{formatDate(w.created_at)}</div>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '1rem', color: w.status === 'paid' ? '#5DCAA5' : '#FFB347' }}>₹{formatNum(w.amount)}</div>
+                    <div style={{ fontSize: '0.72rem', color: w.status === 'paid' ? '#5DCAA5' : '#FFB347', marginTop: '2px' }}>{w.status}</div>
+                  </div>
                 </div>
-              </div>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button type="submit" className="form-submit" disabled={withdrawing}>
-                  {withdrawing ? 'Submitting...' : 'Confirm Withdrawal →'}
-                </button>
-                <button type="button" className="btn-secondary" style={{ padding: '0.9rem', borderRadius: '8px' }} onClick={() => setShowWithdraw(false)}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          )
-        ) : (
-          <div className="cpv-manual-note" style={{ marginBottom: '2rem' }}>
-            Complete campaigns to start earning. Your withdrawable balance will appear here.
-          </div>
+              ))}
+            </div>
+          </>
         )}
 
         {/* Earnings history */}
         <div className="cpv-section-title" style={{ marginBottom: '1rem' }}>Earnings History</div>
-
         {applications.length === 0 && cpvSubmissions.length === 0 ? (
           <div className="campaigns-empty" style={{ padding: '2rem 0' }}>
             <div className="empty-icon">📋</div>
             <div className="empty-title">No earnings yet</div>
-            <p className="empty-desc">Complete campaigns to start earning. Your payment history will appear here.</p>
+            <p className="empty-desc">Complete campaigns to start earning.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {applications.map((app) => (
+            {applications.map(app => (
               <div className="earning-item" key={app.id}>
                 <div className="earning-item-left">
                   <div className="earning-item-icon">🤝</div>
                   <div>
                     <div className="earning-item-title">{app.campaigns?.title || 'Campaign'}</div>
-                    <div className="earning-item-type">{app.campaigns?.campaign_type?.replace('_', ' ')} campaign · {formatDate(app.created_at)}</div>
+                    <div className="earning-item-type">{app.campaigns?.campaign_type?.replace('_', ' ')} · {formatDate(app.created_at)}</div>
                   </div>
                 </div>
                 <div className="earning-item-amount">+₹{formatNum(calculateAppEarning(app))}</div>
               </div>
             ))}
-            {cpvSubmissions.map((sub) => (
+            {cpvSubmissions.map(sub => (
               <div className="earning-item" key={sub.id}>
                 <div className="earning-item-left">
                   <div className="earning-item-icon">📊</div>
