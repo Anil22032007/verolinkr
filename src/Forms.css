@@ -1362,3 +1362,82 @@
 }
 
 .sort-select option { background: #1a1a24; }
+
+/* CREATOR PROFILE SNAPSHOT */
+.creator-profile-snapshot {
+  background: rgba(255,92,53,0.04);
+  border: 1px solid rgba(255,92,53,0.12);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.snapshot-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--vero-text);
+  margin-bottom: 0.5rem;
+}
+
+.snapshot-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.snapshot-stat {
+  font-size: 0.8rem;
+  color: var(--vero-muted);
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* GIG REVIEWS */
+.star-rating {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.star {
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.1s;
+  filter: grayscale(1);
+  opacity: 0.4;
+}
+
+.star.active {
+  filter: none;
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.star:hover {
+  filter: none;
+  opacity: 0.8;
+  transform: scale(1.15);
+}
+
+.review-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.review-stars {
+  font-size: 1rem;
+  letter-spacing: 2px;
+}
+
+.review-text {
+  font-size: 0.83rem;
+  color: var(--vero-muted);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.5;
+}
