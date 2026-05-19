@@ -3,6 +3,7 @@ import { supabase } from './supabase';
 import CreateCampaign from './CreateCampaign';
 import ManageCampaigns from './ManageCampaigns';
 import BrowseCampaigns from './BrowseCampaigns';
+import MyCampaigns from './MyCampaigns';
 import GigMarketplace from './GigMarketplace';
 import GigOrderManagement from './GigOrderManagement';
 import CreatorApplications from './CreatorApplications';
@@ -40,7 +41,11 @@ function Dashboard({ user, onSignOut }) {
   };
 
   const fetchUnreadCount = async () => {
-    const { count } = await supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('read', false);
+    const { count } = await supabase
+      .from('notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('read', false);
     setUnreadCount(count || 0);
   };
 
@@ -49,12 +54,14 @@ function Dashboard({ user, onSignOut }) {
 
   if (loading) return <div className="dash-loading">Loading your dashboard...</div>;
 
+  // Route to pages
   if (view === 'create') return <CreateCampaign user={user} onBack={() => setView('home')} onCreated={() => setView('manage')} onGigMarketplace={() => setView('gigs')} />;
   if (view === 'manage') return <ManageCampaigns user={user} onBack={() => setView('home')} onCreateNew={() => setView('create')} />;
   if (view === 'browse') return <BrowseCampaigns user={user} onBack={() => setView('home')} />;
+  if (view === 'mycampaigns') return <MyCampaigns user={user} onBack={() => setView('home')} />;
+  if (view === 'myapps') return <CreatorApplications user={user} onBack={() => setView('home')} />;
   if (view === 'gigs') return <GigMarketplace user={user} role={role} onBack={() => setView('home')} />;
   if (view === 'gigorders') return <GigOrderManagement user={user} role={role} onBack={() => setView('home')} />;
-  if (view === 'myapps') return <CreatorApplications user={user} onBack={() => setView('home')} />;
   if (view === 'cpv') return <CPVTracking user={user} onBack={() => setView('home')} />;
   if (view === 'cpvdash') return <CPVDashboard user={user} onBack={() => setView('home')} />;
   if (view === 'leaderboard') return <CPVLeaderboard user={user} onBack={() => setView('home')} />;
@@ -86,28 +93,37 @@ function Dashboard({ user, onSignOut }) {
       <div className="dash-content">
         <div className="dash-welcome">
           <h1>Welcome back, {name?.split(' ')[0]} 👋</h1>
-          <p>{role === 'brand' ? 'Create campaigns, fund escrow, track performance.' : 'Browse campaigns, apply for deals, track your views and earnings.'}</p>
+          <p>{role === 'brand'
+            ? 'Launch campaigns. Creators join instantly. Pay only for results.'
+            : 'Join campaigns instantly. Post content. Get paid automatically.'
+          }</p>
         </div>
 
         <div className="dash-cards">
           {role === 'creator' ? (
             <>
               <div className="dash-card clickable" onClick={() => setView('browse')}>
-                <div className="dash-card-icon">🎯</div>
+                <div className="dash-card-icon">🔍</div>
                 <div className="dash-card-title">Browse Campaigns</div>
-                <p className="dash-card-desc">Find Participation and One Time campaigns. Apply directly.</p>
-                <div className="dash-card-action">Browse Now →</div>
+                <p className="dash-card-desc">Join CPV and Participation campaigns instantly. Apply for One Time campaigns.</p>
+                <div className="dash-card-action">Browse →</div>
+              </div>
+              <div className="dash-card clickable" onClick={() => setView('mycampaigns')}>
+                <div className="dash-card-icon">🚀</div>
+                <div className="dash-card-title">My Campaigns</div>
+                <p className="dash-card-desc">CPV and Participation campaigns you joined. Submit posts and track payments.</p>
+                <div className="dash-card-action">View →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('myapps')}>
-                <div className="dash-card-icon">📋</div>
+                <div className="dash-card-icon">🤝</div>
                 <div className="dash-card-title">My Applications</div>
-                <p className="dash-card-desc">Track applications and submit content for approved campaigns.</p>
+                <p className="dash-card-desc">One Time campaign applications. Submit content when approved.</p>
                 <div className="dash-card-action">View →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('cpv')}>
                 <div className="dash-card-icon">📊</div>
                 <div className="dash-card-title">CPV Tracking</div>
-                <p className="dash-card-desc">Submit posts to CPV campaigns. Track views and earnings.</p>
+                <p className="dash-card-desc">Submit YouTube posts. Track verified views. Earn per milestone automatically.</p>
                 <div className="dash-card-action">Track →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('leaderboard')}>
@@ -116,23 +132,17 @@ function Dashboard({ user, onSignOut }) {
                 <p className="dash-card-desc">See top creators across CPV campaigns. Compete for top spot.</p>
                 <div className="dash-card-action">View →</div>
               </div>
-              <div className="dash-card clickable" onClick={() => setView('creatorsearch')}>
-                <div className="dash-card-icon">🔍</div>
-                <div className="dash-card-title">Find Creators</div>
-                <p className="dash-card-desc">Search verified creators by niche, followers, and engagement rate.</p>
-                <div className="dash-card-action">Search →</div>
-              </div>
               <div className="dash-card clickable" onClick={() => setView('gigs')}>
                 <div className="dash-card-icon">⚡</div>
                 <div className="dash-card-title">Gig Marketplace</div>
-                <p className="dash-card-desc">List your services. Get brand orders directly.</p>
+                <p className="dash-card-desc">List your services. Get brand orders directly. Earn consistently.</p>
                 <div className="dash-card-action">Manage →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('gigorders')}>
                 <div className="dash-card-icon">📦</div>
                 <div className="dash-card-title">Gig Orders</div>
-                <p className="dash-card-desc">Deliver your gig orders and get paid instantly on approval.</p>
-                <div className="dash-card-action">View Orders →</div>
+                <p className="dash-card-desc">Deliver your gig orders and get paid on approval.</p>
+                <div className="dash-card-action">View →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('calendar')}>
                 <div className="dash-card-icon">📅</div>
@@ -143,8 +153,8 @@ function Dashboard({ user, onSignOut }) {
               <div className="dash-card clickable" onClick={() => setView('wallet')}>
                 <div className="dash-card-icon">💰</div>
                 <div className="dash-card-title">Earnings Wallet</div>
-                <p className="dash-card-desc">Track earnings and request withdrawals to your UPI.</p>
-                <div className="dash-card-action">View Wallet →</div>
+                <p className="dash-card-desc">Track all earnings and request withdrawals to your UPI.</p>
+                <div className="dash-card-action">View →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('profile')}>
                 <div className="dash-card-icon">👤</div>
@@ -158,29 +168,29 @@ function Dashboard({ user, onSignOut }) {
               <div className="dash-card clickable" onClick={() => setView('create')}>
                 <div className="dash-card-icon">📋</div>
                 <div className="dash-card-title">Create Campaign</div>
-                <p className="dash-card-desc">Launch CPV, Participation, One Time, or Gig campaigns.</p>
+                <p className="dash-card-desc">Launch CPV, Participation, One Time, or Gig campaigns. Creators join instantly.</p>
                 <div className="dash-card-action">Create Now →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('manage')}>
                 <div className="dash-card-icon">🔍</div>
                 <div className="dash-card-title">My Campaigns</div>
-                <p className="dash-card-desc">Fund escrow, review applications, approve content.</p>
+                <p className="dash-card-desc">See who joined, submitted content, and manage all payments.</p>
                 <div className="dash-card-action">Manage →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('analytics')}>
                 <div className="dash-card-icon">📈</div>
                 <div className="dash-card-title">Analytics</div>
-                <p className="dash-card-desc">Track performance across all your campaigns.</p>
+                <p className="dash-card-desc">Track performance, participants, and ROI across all campaigns.</p>
                 <div className="dash-card-action">View →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('cpvdash')}>
                 <div className="dash-card-icon">📊</div>
                 <div className="dash-card-title">CPV Monitor</div>
-                <p className="dash-card-desc">Track views, verify submissions, monitor CPV performance.</p>
+                <p className="dash-card-desc">Track views, verify submissions, monitor CPV campaign performance.</p>
                 <div className="dash-card-action">Monitor →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('creatorsearch')}>
-                <div className="dash-card-icon">🔍</div>
+                <div className="dash-card-icon">🔎</div>
                 <div className="dash-card-title">Find Creators</div>
                 <p className="dash-card-desc">Search verified creators by niche, followers, and engagement rate.</p>
                 <div className="dash-card-action">Search →</div>
@@ -188,14 +198,14 @@ function Dashboard({ user, onSignOut }) {
               <div className="dash-card clickable" onClick={() => setView('gigs')}>
                 <div className="dash-card-icon">⚡</div>
                 <div className="dash-card-title">Gig Marketplace</div>
-                <p className="dash-card-desc">Browse verified creator gigs. Order instantly.</p>
+                <p className="dash-card-desc">Browse verified creator gigs. Order instantly. Escrow protected.</p>
                 <div className="dash-card-action">Browse →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('gigorders')}>
                 <div className="dash-card-icon">📦</div>
                 <div className="dash-card-title">Gig Orders</div>
-                <p className="dash-card-desc">Review gig deliveries and approve to release payment.</p>
-                <div className="dash-card-action">View Orders →</div>
+                <p className="dash-card-desc">Review deliveries and approve to release payments.</p>
+                <div className="dash-card-action">View →</div>
               </div>
               <div className="dash-card clickable" onClick={() => setView('profile')}>
                 <div className="dash-card-icon">🏢</div>
@@ -208,14 +218,14 @@ function Dashboard({ user, onSignOut }) {
         </div>
 
         <div className="dash-models-bar">
-          <div className="dash-models-title">VeroLinkr's 4 Campaign Models</div>
+          <div className="dash-models-title">VeroLinkr — Campaign Driven Platform</div>
           <div className="dash-models-list">
             {[
               { icon: '📊', name: 'CPV', desc: 'Pay per verified view' },
-              { icon: '🚀', name: 'Participation', desc: 'UGC at scale' },
-              { icon: '🤝', name: 'One Time', desc: 'Controlled quality deal' },
+              { icon: '🚀', name: 'Participation', desc: 'Instant join, fixed payout' },
+              { icon: '🤝', name: 'One Time', desc: 'Select specific creators' },
               { icon: '⚡', name: 'Gig', desc: 'On demand content' },
-            ].map((m) => (
+            ].map(m => (
               <div className="dash-model-pill" key={m.name}>
                 <span>{m.icon}</span>
                 <div>
